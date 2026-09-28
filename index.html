@@ -8,14 +8,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-<header>
-  <div class="wrap nav">
-    <a class="brand" href="#home">HANYANG<br><span>PHILOSOPHY</span></a>
-    <nav>
-      <a href="#notice">공지</a><a href="#discussion">토론게시판</a><a href="#free">자유게시판</a><a href="#archive">과지</a>
-    </nav>
-  </div>
-</header>
+<header><div class="wrap nav">
+  <a class="brand" href="#home">HANYANG<br><span>PHILOSOPHY</span></a>
+  <nav><a href="#notice">공지</a><a href="#discussion">토론게시판</a><a href="#free">자유게시판</a><a href="#archive">과지</a></nav>
+</div></header>
 
 <main>
 <section id="home" class="hero wrap">
@@ -27,102 +23,151 @@
 
 <section id="notice" class="section wrap">
   <div class="section-head"><div><p class="eyebrow">NOTICE</p><h2>공지</h2></div></div>
-  <article class="notice">
-    <h3>커뮤니티 이용 안내</h3>
-    <ul>
-      <li>서로의 의견과 인격을 존중해 주세요.</li>
-      <li>토론 과정에서는 가능한 한 근거와 논리를 함께 제시해 주세요.</li>
-      <li>욕설, 혐오·차별 표현, 타인의 개인정보 공개, 특정인을 향한 모욕·비방은 삼가 주세요.</li>
-      <li>게시물과 댓글은 자유롭게 작성할 수 있으며, 운영 취지에 반하는 게시물은 관리될 수 있습니다.</li>
-      <li>익명성을 존중하되, 다른 이용자의 신원을 추측하거나 공개하지 말아 주세요.</li>
-    </ul>
-  </article>
+  <article class="notice"><h3>커뮤니티 이용 안내</h3><ul>
+    <li>서로의 의견과 인격을 존중해 주세요.</li>
+    <li>토론 과정에서는 가능한 한 근거와 논리를 함께 제시해 주세요.</li>
+    <li>욕설, 혐오·차별 표현, 타인의 개인정보 공개, 특정인을 향한 모욕·비방은 삼가 주세요.</li>
+    <li>글과 댓글을 작성할 때 비밀번호를 설정합니다. 비밀번호를 잊으면 수정·삭제할 수 없습니다.</li>
+    <li>익명성을 존중하되, 다른 이용자의 신원을 추측하거나 공개하지 말아 주세요.</li>
+  </ul></article>
 </section>
 
 <section id="discussion" class="section wrap">
   <div class="section-head"><div><p class="eyebrow">DISCUSSION</p><h2>토론게시판</h2></div><button class="btn dark" onclick="openComposer('discussion')">글쓰기</button></div>
+  <div class="board-head"><span>번호</span><span>제목</span><span>글쓴이</span><span>작성</span></div>
   <div id="discussionList" class="posts"></div>
 </section>
 
 <section id="free" class="section wrap">
   <div class="section-head"><div><p class="eyebrow">FREE</p><h2>자유게시판</h2></div><button class="btn dark" onclick="openComposer('free')">글쓰기</button></div>
+  <div class="board-head"><span>번호</span><span>제목</span><span>글쓴이</span><span>작성</span></div>
   <div id="freeList" class="posts"></div>
 </section>
 
 <section id="archive" class="section wrap">
-  <div class="section-head"><div><p class="eyebrow">ARCHIVE</p><h2>과지</h2><p class="muted">PDF를 올리면 브라우저에서 책처럼 펼쳐볼 수 있습니다.</p></div></div>
+  <div class="section-head"><div><p class="eyebrow">ARCHIVE</p><h2>과지</h2><p class="muted">PDF를 등록하면 목록에서 바로 열람할 수 있습니다.</p></div></div>
+  <div class="upload-box">
+    <div><b>과지 등록</b><p class="muted">PDF 파일만 등록할 수 있습니다.</p></div>
+    <label class="btn dark file-btn">PDF 선택<input id="magFile" type="file" accept="application/pdf" onchange="uploadMagazine()"></label>
+  </div>
   <div id="magazines" class="mag-grid"></div>
 </section>
 </main>
 
-<div id="composer" class="modal hidden">
- <div class="modal-card">
-   <button class="close" onclick="closeComposer()">×</button>
-   <p class="eyebrow">ANONYMOUS POST</p><h2>새 글</h2>
-   <input id="nickname" maxlength="20" placeholder="별명 (예: 소크라테스)" />
-   <input id="title" maxlength="100" placeholder="제목" />
-   <textarea id="body" maxlength="5000" rows="9" placeholder="내용을 입력하세요."></textarea>
-   <button class="btn dark full" onclick="submitPost()">게시하기</button>
- </div>
-</div>
+<div id="composer" class="modal hidden"><div class="modal-card">
+  <button class="close" onclick="closeComposer()">×</button><p class="eyebrow">ANONYMOUS POST</p><h2>새 글</h2>
+  <input id="nickname" maxlength="20" placeholder="별명 (예: 소크라테스)">
+  <input id="title" maxlength="100" placeholder="제목">
+  <textarea id="body" maxlength="5000" rows="9" placeholder="내용을 입력하세요."></textarea>
+  <input id="postPassword" type="password" maxlength="50" placeholder="임시 비밀번호 (4자 이상)">
+  <p class="muted small">이 비밀번호가 있어야 나중에 글을 수정하거나 삭제할 수 있습니다.</p>
+  <button class="btn dark full" onclick="submitPost()">게시하기</button>
+</div></div>
 
-<div id="postModal" class="modal hidden">
- <div class="modal-card post-detail">
-   <button class="close" onclick="closePost()">×</button>
-   <div id="postDetail"></div>
- </div>
-</div>
+<div id="postModal" class="modal hidden"><div class="modal-card post-detail">
+  <button class="close" onclick="closePost()">×</button><div id="postDetail"></div>
+</div></div>
+
+<div id="passwordModal" class="modal hidden"><div class="modal-card small-modal">
+  <button class="close" onclick="closePasswordModal()">×</button><p class="eyebrow">PASSWORD</p><h2 id="passwordTitle">비밀번호 확인</h2>
+  <input id="actionPassword" type="password" placeholder="작성할 때 설정한 비밀번호">
+  <button class="btn dark full" onclick="confirmPasswordAction()">확인</button>
+</div></div>
 
 <script>
-const SUPABASE_URL = "https://rcxcslernekjzaoybkar.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_aPQ-Dk6uUj59_FReuc4iEg_Iz0W4oOb";
-const configured = !SUPABASE_URL.startsWith("YOUR_");
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+const configured = !SUPABASE_URL.startsWith("YOUR_") && !SUPABASE_ANON_KEY.startsWith("YOUR_");
 const db = configured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-let currentBoard = "discussion", currentPost = null;
+let currentBoard="discussion", currentPost=null, pendingAction=null;
 
 function esc(s){return (s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
-function ago(d){const x=Math.floor((Date.now()-new Date(d))/60000); return x<1?"방금":x<60?x+"분 전":x<1440?Math.floor(x/60)+"시간 전":Math.floor(x/1440)+"일 전";}
+function ago(d){const x=Math.floor((Date.now()-new Date(d))/60000);return x<1?"방금":x<60?x+"분 전":x<1440?Math.floor(x/60)+"시간 전":Math.floor(x/1440)+"일 전";}
+function shortDate(d){const x=new Date(d);return `${String(x.getMonth()+1).padStart(2,'0')}.${String(x.getDate()).padStart(2,'0')}`;}
+function showError(error){alert(error?.message||"오류가 발생했습니다.");}
+
 async function loadPosts(board){
   const el=document.getElementById(board+"List");
-  if(!configured){el.innerHTML='<div class="empty">Supabase를 연결하면 실제 익명 커뮤니티로 작동합니다.<br>현재는 디자인/화면 프로토타입입니다.</div>';return;}
-  const {data,error}=await db.from("posts").select("*").eq("board",board).order("created_at",{ascending:false});
+  if(!configured){el.innerHTML='<div class="empty">Supabase를 연결하면 실제 익명 커뮤니티로 작동합니다.</div>';return;}
+  const {data,error}=await db.from("posts").select("id,board,nickname,title,body,created_at").eq("board",board).order("created_at",{ascending:false});
   if(error){el.innerHTML='<div class="empty">게시물을 불러오지 못했습니다.</div>';return;}
-  el.innerHTML=data.length?data.map(p=>`<article class="post" onclick="openPost('${p.id}')"><div><span class="tag">${board==="discussion"?"토론":"자유"}</span><h3>${esc(p.title)}</h3><p>${esc(p.body).slice(0,180)}</p></div><div class="meta">${esc(p.nickname)} · ${ago(p.created_at)}</div></article>`).join(""):'<div class="empty">아직 게시물이 없습니다.</div>';
+  el.innerHTML=data.length?data.map((p,i)=>`<article class="post-row" onclick="openPost('${p.id}')"><span class="num">${data.length-i}</span><span class="post-title"><b>${esc(p.title)}</b><small>${esc(p.body).replace(/\n/g,' ').slice(0,80)}</small></span><span>${esc(p.nickname)}</span><span>${shortDate(p.created_at)}</span></article>`).join(""):'<div class="empty">아직 게시물이 없습니다.</div>';
 }
-function openComposer(board){currentBoard=board; document.getElementById("composer").classList.remove("hidden");}
+function openComposer(board){currentBoard=board;document.getElementById("composer").classList.remove("hidden");}
 function closeComposer(){document.getElementById("composer").classList.add("hidden");}
 async function submitPost(){
-  const nickname=document.getElementById("nickname").value.trim(), title=document.getElementById("title").value.trim(), body=document.getElementById("body").value.trim();
-  if(!nickname||!title||!body){alert("별명, 제목, 내용을 모두 입력해주세요.");return;}
+  const nickname=document.getElementById("nickname").value.trim(),title=document.getElementById("title").value.trim(),body=document.getElementById("body").value.trim(),password=document.getElementById("postPassword").value;
+  if(!nickname||!title||!body||password.length<4){alert("별명, 제목, 내용과 4자 이상의 비밀번호를 입력해주세요.");return;}
   if(!configured){alert("먼저 Supabase 연결 설정이 필요합니다.");return;}
-  const {error}=await db.from("posts").insert({board:currentBoard,nickname,title,body});
-  if(error){alert("게시하지 못했습니다: "+error.message);return;}
-  document.getElementById("nickname").value=document.getElementById("title").value=document.getElementById("body").value="";
-  closeComposer(); loadPosts("discussion"); loadPosts("free");
+  const {error}=await db.rpc("create_post",{p_board:currentBoard,p_nickname:nickname,p_title:title,p_body:body,p_password:password});
+  if(error){showError(error);return;}
+  ["nickname","title","body","postPassword"].forEach(id=>document.getElementById(id).value="");closeComposer();loadPosts("discussion");loadPosts("free");
 }
+
 async function openPost(id){
   if(!configured)return;
-  const {data:p}=await db.from("posts").select("*").eq("id",id).single();
-  if(!p)return;
+  const {data:p,error}=await db.from("posts").select("id,board,nickname,title,body,created_at").eq("id",id).single();
+  if(error||!p){showError(error||{message:"게시물을 찾을 수 없습니다."});return;}
   currentPost=p;
-  const {data:c}=await db.from("comments").select("*").eq("post_id",id).order("created_at");
-  document.getElementById("postDetail").innerHTML=`<p class="eyebrow">${p.board==="discussion"?"토론":"자유"}</p><h2>${esc(p.title)}</h2><div class="meta">${esc(p.nickname)} · ${ago(p.created_at)}</div><div class="post-body">${esc(p.body).replace(/\n/g,"<br>")}</div><hr><h3>댓글</h3><div id="comments">${(c||[]).map(x=>`<div class="comment"><b>${esc(x.nickname)}</b><span>${ago(x.created_at)}</span><p>${esc(x.body)}</p></div>`).join("")||"<p class='muted'>첫 댓글을 남겨보세요.</p>"}</div><div class="comment-form"><input id="commentNick" placeholder="별명"><textarea id="commentBody" rows="3" placeholder="댓글"></textarea><button class="btn dark" onclick="addComment()">댓글 달기</button></div>`;
+  const {data:c}=await db.from("comments").select("id,nickname,body,created_at").eq("post_id",id).order("created_at");
+  document.getElementById("postDetail").innerHTML=`
+    <p class="eyebrow">${p.board==='discussion'?'토론':'자유'}</p><h2>${esc(p.title)}</h2>
+    <div class="meta">${esc(p.nickname)} · ${ago(p.created_at)} <span class="detail-actions"><button onclick="event.stopPropagation();requestPostAction('edit')">수정</button><button onclick="event.stopPropagation();requestPostAction('delete')">삭제</button></span></div>
+    <div class="post-body">${esc(p.body).replace(/\n/g,"<br>")}</div><hr><h3>댓글</h3>
+    <div id="comments">${(c||[]).map(x=>`<div class="comment"><div><b>${esc(x.nickname)}</b><span>${ago(x.created_at)}</span></div><p>${esc(x.body).replace(/\n/g,'<br>')}</p><div class="comment-actions"><button onclick="requestCommentAction('${x.id}','edit')">수정</button><button onclick="requestCommentAction('${x.id}','delete')">삭제</button></div></div>`).join("")||"<p class='muted'>첫 댓글을 남겨보세요.</p>"}</div>
+    <div class="comment-form"><input id="commentNick" maxlength="20" placeholder="별명"><textarea id="commentBody" maxlength="2000" rows="3" placeholder="댓글"></textarea><input id="commentPassword" type="password" maxlength="50" placeholder="임시 비밀번호 (4자 이상)"><button class="btn dark" onclick="addComment()">댓글 달기</button></div>`;
   document.getElementById("postModal").classList.remove("hidden");
 }
 function closePost(){document.getElementById("postModal").classList.add("hidden");}
 async function addComment(){
-  const nickname=document.getElementById("commentNick").value.trim(), body=document.getElementById("commentBody").value.trim();
-  if(!nickname||!body){alert("별명과 댓글을 입력해주세요.");return;}
-  const {error}=await db.from("comments").insert({post_id:currentPost.id,nickname,body});
-  if(error){alert(error.message);return;}
-  openPost(currentPost.id);
+  const nickname=document.getElementById("commentNick").value.trim(),body=document.getElementById("commentBody").value.trim(),password=document.getElementById("commentPassword").value;
+  if(!nickname||!body||password.length<4){alert("별명, 댓글과 4자 이상의 비밀번호를 입력해주세요.");return;}
+  const {error}=await db.rpc("create_comment",{p_post_id:currentPost.id,p_nickname:nickname,p_body:body,p_password:password});
+  if(error){showError(error);return;} openPost(currentPost.id);
 }
+function requestPostAction(action){pendingAction={type:'post',action,id:currentPost.id};document.getElementById('passwordTitle').textContent=action==='edit'?'글 수정':'글 삭제';document.getElementById('actionPassword').value='';document.getElementById('passwordModal').classList.remove('hidden');}
+function requestCommentAction(id,action){pendingAction={type:'comment',action,id};document.getElementById('passwordTitle').textContent=action==='edit'?'댓글 수정':'댓글 삭제';document.getElementById('actionPassword').value='';document.getElementById('passwordModal').classList.remove('hidden');}
+function closePasswordModal(){document.getElementById('passwordModal').classList.add('hidden');pendingAction=null;}
+async function confirmPasswordAction(){
+  const pw=document.getElementById('actionPassword').value;if(!pw){alert('비밀번호를 입력해주세요.');return;} const a=pendingAction;if(!a)return;
+  if(a.type==='post'){
+    if(a.action==='delete'){
+      if(!confirm('이 글을 삭제할까요?'))return;
+      const {error}=await db.rpc('delete_post',{p_id:a.id,p_password:pw});if(error){showError(error);return;}closePasswordModal();closePost();loadPosts('discussion');loadPosts('free');return;
+    }
+    closePasswordModal();openEditPost(a.id,pw);return;
+  }
+  if(a.action==='delete'){
+    if(!confirm('이 댓글을 삭제할까요?'))return;
+    const {error}=await db.rpc('delete_comment',{p_id:a.id,p_password:pw});if(error){showError(error);return;}closePasswordModal();openPost(currentPost.id);return;
+  }
+  closePasswordModal();openEditComment(a.id,pw);
+}
+async function openEditPost(id,pw){
+  const {data,error}=await db.from('posts').select('title,body').eq('id',id).single();if(error){showError(error);return;}
+  document.getElementById('postDetail').innerHTML=`<p class="eyebrow">EDIT POST</p><h2>글 수정</h2><input id="editTitle" maxlength="100" value="${esc(data.title)}"><textarea id="editBody" rows="12" maxlength="5000">${esc(data.body)}</textarea><div class="edit-actions"><button class="btn" onclick="openPost('${id}')">취소</button><button class="btn dark" onclick="savePostEdit('${id}','${esc(pw)}')">저장</button></div>`;
+}
+async function savePostEdit(id,pw){const title=document.getElementById('editTitle').value.trim(),body=document.getElementById('editBody').value.trim();if(!title||!body){alert('제목과 내용을 입력해주세요.');return;}const {error}=await db.rpc('update_post',{p_id:id,p_title:title,p_body:body,p_password:pw});if(error){showError(error);return;}loadPosts('discussion');loadPosts('free');openPost(id);}
+async function openEditComment(id,pw){
+  const {data,error}=await db.from('comments').select('body').eq('id',id).single();if(error){showError(error);return;}
+  document.getElementById('postDetail').innerHTML=`<p class="eyebrow">EDIT COMMENT</p><h2>댓글 수정</h2><textarea id="editCommentBody" rows="8" maxlength="2000">${esc(data.body)}</textarea><div class="edit-actions"><button class="btn" onclick="openPost('${currentPost.id}')">취소</button><button class="btn dark" onclick="saveCommentEdit('${id}','${esc(pw)}')">저장</button></div>`;
+}
+async function saveCommentEdit(id,pw){const body=document.getElementById('editCommentBody').value.trim();if(!body){alert('댓글 내용을 입력해주세요.');return;}const {error}=await db.rpc('update_comment',{p_id:id,p_body:body,p_password:pw});if(error){showError(error);return;}openPost(currentPost.id);}
+
 async function loadMagazines(){
-  const el=document.getElementById("magazines");
-  if(!configured){el.innerHTML='<div class="mag-card"><div class="cover">PHILOSOPHY<br>MAGAZINE</div><h3>과지 PDF 아카이브</h3><p>Supabase Storage를 연결하면 PDF가 이곳에 표시됩니다.</p></div>';return;}
-  const {data}=await db.storage.from("magazines").list("",{sortBy:{column:"name",order:"desc"}});
-  el.innerHTML=(data||[]).map(f=>{const url=db.storage.from("magazines").getPublicUrl(f.name).data.publicUrl;return `<a class="mag-card" href="${url}" target="_blank"><div class="cover">PHILOSOPHY<br>MAGAZINE</div><h3>${esc(f.name)}</h3><p>PDF로 열기 ↗</p></a>`}).join("")||'<div class="empty">아직 등록된 과지가 없습니다.</div>';
+  const el=document.getElementById('magazines');if(!configured){el.innerHTML='<div class="empty">Supabase를 연결하면 과지를 등록할 수 있습니다.</div>';return;}
+  const {data,error}=await db.storage.from('magazines').list('',{sortBy:{column:'name',order:'desc'}});
+  if(error){el.innerHTML='<div class="empty">과지 목록을 불러오지 못했습니다. Storage 정책을 확인해주세요.</div>';return;}
+  const files=(data||[]).filter(f=>f.name.toLowerCase().endsWith('.pdf'));
+  el.innerHTML=files.map(f=>{const url=db.storage.from('magazines').getPublicUrl(f.name).data.publicUrl;return `<a class="mag-card" href="${url}" target="_blank"><div class="cover">PHILOSOPHY<br>MAGAZINE</div><h3>${esc(f.name)}</h3><p>PDF 열람 ↗</p></a>`}).join('')||'<div class="empty">아직 등록된 과지가 없습니다.</div>';
 }
-loadPosts("discussion");loadPosts("free");loadMagazines();
+async function uploadMagazine(){
+  const input=document.getElementById('magFile'),file=input.files[0];if(!file)return;if(file.type!=='application/pdf'){alert('PDF 파일만 등록할 수 있습니다.');input.value='';return;}
+  if(!configured){alert('먼저 Supabase 연결 설정이 필요합니다.');return;}
+  const safe=file.name.replace(/[^\w가-힣.()\- ]/g,'_');const path=`${Date.now()}_${safe}`;
+  const {error}=await db.storage.from('magazines').upload(path,file,{contentType:'application/pdf',upsert:false});
+  if(error){showError(error);return;}input.value='';alert('과지가 등록되었습니다.');loadMagazines();
+}
+loadPosts('discussion');loadPosts('free');loadMagazines();
 </script>
 </body></html>
