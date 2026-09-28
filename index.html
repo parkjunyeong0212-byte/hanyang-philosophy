@@ -168,17 +168,18 @@ function uploadMagazine(){
   if(file.type!=='application/pdf'){alert('PDF 파일만 등록할 수 있습니다.');input.value='';return;}
   if(!configured){alert('먼저 Supabase 연결 설정이 필요합니다.');return;}
   if(file.size>50*1024*1024){alert('파일은 50MB 이하의 PDF만 등록할 수 있습니다.');input.value='';return;}
-  const safe=file.name.replace(/[^\w가-힣.()\- ]/g,'_');
+  const safe=file.name.replace(/[^A-Za-z0-9._()\- ]/g,'_').replace(/\s+/g,'_');
   const path=`${Date.now()}_${safe}`;
   status.textContent='업로드 준비 중...';
   const upload=new tus.Upload(file,{
-    endpoint:`${SUPABASE_URL}/storage/v1/upload/resumable`,
+    endpoint:`${SUPABASE_URL.replace('.supabase.co','.storage.supabase.co')}/storage/v1/upload/resumable`,
     retryDelays:[0,3000,5000,10000,20000],
     headers:{authorization:`Bearer ${SUPABASE_ANON_KEY}`,apikey:SUPABASE_ANON_KEY},
     metadata:{bucketName:'magazines',objectName:path,contentType:'application/pdf',cacheControl:'3600'},
     uploadDataDuringCreation:true,
     removeFingerprintOnSuccess:true,
-   onError(error){status.textContent='업로드 실패';console.error(error);alert('과지 업로드에 실패했습니다.\n'+(error.message||error));},
+    chunkSize:6*1024*1024,
+    onError(error){status.textContent='업로드 실패';console.error(error);alert('과지 업로드에 실패했습니다.\n'+(error.message||error));},
     onProgress(bytesUploaded,bytesTotal){status.textContent=`업로드 중... ${Math.round(bytesUploaded/bytesTotal*100)}%`;},
     onSuccess(){status.textContent='업로드 완료';input.value='';loadMagazines();setTimeout(()=>{status.textContent='';},2500);}
   });
