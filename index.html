@@ -178,8 +178,7 @@ function uploadMagazine(){
     metadata:{bucketName:'magazines',objectName:path,contentType:'application/pdf',cacheControl:'3600'},
     uploadDataDuringCreation:true,
     removeFingerprintOnSuccess:true,
-    onError(error){status.textContent='업로드 실패';console.error(error);alert('과지 업로드에 실패했습니다.
-'+(error.message||error));},
+   onError(error){status.textContent='업로드 실패';console.error(error);alert('과지 업로드에 실패했습니다.\n'+(error.message||error));},
     onProgress(bytesUploaded,bytesTotal){status.textContent=`업로드 중... ${Math.round(bytesUploaded/bytesTotal*100)}%`;},
     onSuccess(){status.textContent='업로드 완료';input.value='';loadMagazines();setTimeout(()=>{status.textContent='';},2500);}
   });
