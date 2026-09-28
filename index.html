@@ -6,6 +6,7 @@
   <title>한양대학교 철학과</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4/dist/tus.min.js"></script>
 </head>
 <body>
 <header><div class="wrap nav">
@@ -48,7 +49,7 @@
   <div class="section-head"><div><p class="eyebrow">ARCHIVE</p><h2>과지</h2><p class="muted">PDF를 등록하면 목록에서 바로 열람할 수 있습니다.</p></div></div>
   <div class="upload-box">
     <div><b>과지 등록</b><p class="muted">PDF 파일만 등록할 수 있습니다.</p></div>
-    <label class="btn dark file-btn">PDF 선택<input id="magFile" type="file" accept="application/pdf" onchange="uploadMagazine()"></label>
+    <label class="btn dark file-btn">PDF 선택<input id="magFile" type="file" accept="application/pdf" onchange="uploadMagazine()"></label><span id="uploadStatus" class="muted small"></span>
   </div>
   <div id="magazines" class="mag-grid"></div>
 </section>
@@ -161,12 +162,31 @@ async function loadMagazines(){
   const files=(data||[]).filter(f=>f.name.toLowerCase().endsWith('.pdf'));
   el.innerHTML=files.map(f=>{const url=db.storage.from('magazines').getPublicUrl(f.name).data.publicUrl;return `<a class="mag-card" href="${url}" target="_blank"><div class="cover">PHILOSOPHY<br>MAGAZINE</div><h3>${esc(f.name)}</h3><p>PDF 열람 ↗</p></a>`}).join('')||'<div class="empty">아직 등록된 과지가 없습니다.</div>';
 }
-async function uploadMagazine(){
-  const input=document.getElementById('magFile'),file=input.files[0];if(!file)return;if(file.type!=='application/pdf'){alert('PDF 파일만 등록할 수 있습니다.');input.value='';return;}
+function uploadMagazine(){
+  const input=document.getElementById('magFile'),file=input.files[0],status=document.getElementById('uploadStatus');
+  if(!file)return;
+  if(file.type!=='application/pdf'){alert('PDF 파일만 등록할 수 있습니다.');input.value='';return;}
   if(!configured){alert('먼저 Supabase 연결 설정이 필요합니다.');return;}
-  const safe=file.name.replace(/[^\w가-힣.()\- ]/g,'_');const path=`${Date.now()}_${safe}`;
-  const {error}=await db.storage.from('magazines').upload(path,file,{contentType:'application/pdf',upsert:false});
-  if(error){showError(error);return;}input.value='';alert('과지가 등록되었습니다.');loadMagazines();
+  if(file.size>50*1024*1024){alert('파일은 50MB 이하의 PDF만 등록할 수 있습니다.');input.value='';return;}
+  const safe=file.name.replace(/[^\w가-힣.()\- ]/g,'_');
+  const path=`${Date.now()}_${safe}`;
+  status.textContent='업로드 준비 중...';
+  const upload=new tus.Upload(file,{
+    endpoint:`${SUPABASE_URL}/storage/v1/upload/resumable`,
+    retryDelays:[0,3000,5000,10000,20000],
+    headers:{authorization:`Bearer ${SUPABASE_ANON_KEY}`,apikey:SUPABASE_ANON_KEY},
+    metadata:{bucketName:'magazines',objectName:path,contentType:'application/pdf',cacheControl:'3600'},
+    uploadDataDuringCreation:true,
+    removeFingerprintOnSuccess:true,
+    onError(error){status.textContent='업로드 실패';console.error(error);alert('과지 업로드에 실패했습니다.
+'+(error.message||error));},
+    onProgress(bytesUploaded,bytesTotal){status.textContent=`업로드 중... ${Math.round(bytesUploaded/bytesTotal*100)}%`;},
+    onSuccess(){status.textContent='업로드 완료';input.value='';loadMagazines();setTimeout(()=>{status.textContent='';},2500);}
+  });
+  upload.findPreviousUploads().then(previousUploads=>{
+    if(previousUploads.length) upload.resumeFromPreviousUpload(previousUploads[0]);
+    upload.start();
+  }).catch(error=>{status.textContent='업로드 준비 실패';console.error(error);alert('업로드 준비에 실패했습니다.');});
 }
 loadPosts('discussion');loadPosts('free');loadMagazines();
 </script>
